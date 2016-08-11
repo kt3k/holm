@@ -4,3 +4,6 @@
 # nyc
 /coverage
 /.nyc_output
+
+#
+/lib
