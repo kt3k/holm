@@ -61,14 +61,12 @@ const main = port => {
 
   server.route({
     method: 'POST',
-    path: '/repos',
+    path: '/repos/:repo',
     handler: (request, reply) => {
       const repo = request.payload
 
-      // TODO: Setting up the repo under `${process.cwd()}/repos/${repo.name}`
-      // does git clone repo.url
-      // does cd repo.name
-      // does git checkout repo.commit
+      // TODO: receive git-pack and put it under `${process.cwd()}/repos/${repo.name}`
+      // does cd to repository dir
       // does npm install
     }
   })
