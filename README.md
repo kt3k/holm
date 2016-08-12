@@ -1,38 +1,100 @@
 # holm v0.1.0 WIP
 
-> Async job loader and DSL
+> REST API base task processor
 
-Holm is a tool for defining the async background job using a git repository and the yaml file in it.
+Holm is a tool for defining the async background job by the yaml file. Holm assumes that each task is implemented as a REST API endpoint. So you need to implement your tasks as REST APIs to use `holm`.
 
 # Install
 
-    npm install holm
+    npm install -g holm
 
 # Get started
 
+## Set up Redis
+
+You need redis to run `holm` server.
+
+```
+redis-server
+```
+
+## Run holm server
+
+The following command starts the `holm` server:
+
+```
+holm server
+```
+
+This starts the `holm` server at the port `7010`.
+
 ## holm.yml
 
-First you need to set up `holm.yml` at the top of your git repository. `holm.yml` defines the tasks you want to process in the background.
+You need to set up `holm.yml` to define your tasks.
 
 It looks like the following:
 
 ```yml
-prepare:
-- npm intall
+host: localhost
+port: 7010
+job:
+  host: localhost
+  port: 7070
 ---
-download-files:
-  job: ./bin/download-file
-  options:
-    delay: 1000
+name: dl-problem
+method: POST
+url: /dl-problem
+options:
+  delay: 1000
 ---
-solve-problem:
-  job: ./bin/solver
+name: solve-problem:
+method: POST
+url: /problems/solve
 ---
-visualize-problem:
-  job: ./bin/problem-to-svg
+name: visualize-problem
+method: POST
+url: /problems/visualize
 ```
 
-## Start processing
+## Set up jobs
+
+Then send the jobs to the `holm` server.
+
+## Job server
+
+Then you need to run the job processing server at `localhost:7070`.
+
+`holm` assumes that your task is, for example in the above example, implemented as the REST endpoint `POST /dl-problem` and request to it with the given payloads.
+
+## Loads the actual tasks
+
+Finally you can loads the actual task by the following command:
+
+```
+holm load dl-problem '{"id":1}' '{"id":2}' ...
+```
+
+where `dl-problem` is the job name. This autocatically starts processing the given payloads with the given job definitions.
 
 
 # The commands
+
+## holm [info]
+
+Shows the holm server status.
+
+## holm up
+
+Send job definitions.
+
+## holm load
+
+Loads the payloads.
+
+## holm server
+
+Starts the holm (queueu) server.
+
+# License
+
+MIT
