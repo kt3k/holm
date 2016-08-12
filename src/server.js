@@ -1,5 +1,6 @@
 const {Server} = require('hapi')
 const Queue = require('bee-queue')
+const axios = require('axios')
 
 const queueMap = {}
 
@@ -15,7 +16,7 @@ const main = port => {
 
   server.route({
     method: 'POST',
-    path: '/repos/:repo/jobs/:job/payloads',
+    path: '/jobs/{name}/payloads',
     handler: (request, reply) => {
       let payloads = request.payload
 
@@ -23,14 +24,11 @@ const main = port => {
         payloads = [payloads]
       }
 
-      const repo = request.param.repo
-      const job = request.param.job
-
-      const queueName = `${repo}/${job}`
-      const queue = queueMap[queueName]
+      const name = request.params.name
+      const queue = queueMap[name]
 
       if (!queue) {
-        return replay({code: 'NO_SUCH_JOB'})
+        return reply({code: 'NO_SUCH_JOB'})
       }
 
       payloads.forEach(payload => queue.createJob(payload).save())
@@ -41,33 +39,53 @@ const main = port => {
 
   server.route({
     method: 'POST',
-    path: '/repos/:repo/jobs',
+    path: '/jobs/{name}',
     handler: (request, reply) => {
       const job = request.payload
 
-      const queueName = `${request.param.repo}/${job.name}`
-      const queue = new Queue(queueName)
-      queueMap[queueName] = queue
+      const name = request.params.name
 
-      const workdir = `${process.cwd()}/${request.param.repo}`
+      if (queueMap[name]) {
+        return reply({
+          code: 'JOB_NAME_UNAVALABLE',
+          description: `There is already an job with the same name: ${name}.`
+        })
+      }
 
-      queue.process((payload, done) => {
-        const child = spawn(job.cmd, payload, {cwd: workdir})
+      if (job == null) {
+        return reply({
+          code: 'INVALID_JOB',
+          description: 'A job should be an object. null is given.'
+        })
+      }
 
-        // call done when child finished
+      if (!/GET|POST|PUT|DELETE|HEAD/.test(job.method)) {
+        return reply({
+          code: 'INVALID_JOB',
+          description: `The job method is invalid: ${job.method}`
+        })
+      }
+
+      const method = job.method
+      const url = job.url
+
+      const queue = queueMap[name] = new Queue(name)
+
+      console.log('Creating job: ' + name)
+
+      queue.process((job, done) => {
+        const data = job.data
+        console.log(`processing ${name} ${data}`)
+        axios({method, url, data})
+        .then(data => done(url, data))
+        .catch(err => {console.log(err.stack); done(err)})
       })
-    }
-  })
 
-  server.route({
-    method: 'POST',
-    path: '/repos/:repo',
-    handler: (request, reply) => {
-      const repo = request.payload
-
-      // TODO: receive git-pack and put it under `${process.cwd()}/repos/${repo.name}`
-      // does cd to repository dir
-      // does npm install
+      reply({
+        ok: true,
+        description: `A job is created. The name is '${name}'.`,
+        job: {name, method, url}
+      })
     }
   })
 
@@ -76,7 +94,7 @@ const main = port => {
       throw err
     }
 
-    console.log('Server running at:', server.info.uri);
+    console.log('Server running at:', server.info.uri)
   })
 }
 
