@@ -1,4 +1,4 @@
-# holm v0.1.0 WIP
+# holm v0.1.0 (SUSPENDED)
 
 > REST API base task processor
 
