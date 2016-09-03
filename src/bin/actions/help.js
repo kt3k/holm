@@ -1,4 +1,4 @@
-module.exports = `
+module.exports = () => console.log(`
 
 Usage: holm [--version] [--help] <command> [<param>...]
 
@@ -11,4 +11,4 @@ Usage:
                     Loads the payloads to the holm server
   holm server       Starts the holm server
 
-`.trim()
+`.trim())

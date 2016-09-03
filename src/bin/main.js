@@ -1,10 +1,6 @@
 'use strict'
 
-const router = require('./router')
-
-const showHelp = () => {
-  console.log(require('./help'))
-}
+const dispatch = require('cli-dispatch')
 
 module.exports = main
 
@@ -18,29 +14,19 @@ module.exports = main
  */
 function main ({_: [action], h, help, v, version}) {
   if (h || help) {
-    showHelp()
-    return
+    action = 'help'
   }
 
   if (v || version) {
-    const pkg = require('../../package')
-    console.log(`${pkg.name} v${pkg.version}`)
-    return
+    action = 'version'
   }
 
   if (!action) {
     action = 'info'
   }
 
-  try {
-    router(`${__dirname}/actions`, action, arguments[0])
-  } catch (e) {
-    if (e.code === 'NO_SUCH_ACTION') {
-      showHelp()
-
-      return 1
-    }
-
-    throw e
-  }
+  dispatch(action, arguments[0]).on('no-action', () => {
+    console.log(`No such command: ${action}`)
+    process.exit(1)
+  })
 }

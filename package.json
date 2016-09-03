@@ -33,6 +33,7 @@
   "dependencies": {
     "axios": "^0.13.1",
     "bee-queue": "^0.3.0",
+    "cli-dispatch": "^1.0.0",
     "dargs": "^5.0.1",
     "hapi": "^14.1.0",
     "js-yaml": "^3.6.1",
