@@ -1,6 +1,6 @@
 {
   "name": "holm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Async job loader and DSL",
   "main": "lib/index.js",
   "bin": "bin/holm.js",
