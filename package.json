@@ -34,7 +34,7 @@
     "axios": "^0.15.2",
     "bee-queue": "^0.3.0",
     "dargs": "^5.0.1",
-    "hapi": "^16.1.0",
+    "hapi": "^16.1.1",
     "js-yaml": "^3.6.1",
     "minimisted": "^1.1.1",
     "minirocket": "^2.0.0"
