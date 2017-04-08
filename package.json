@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/kt3k/holm#readme",
   "dependencies": {
-    "axios": "^0.16.0",
+    "axios": "^0.16.1",
     "bee-queue": "^0.3.0",
     "dargs": "^5.0.1",
     "hapi": "^16.1.0",
